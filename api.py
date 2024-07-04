@@ -1,6 +1,3 @@
-#esto es un ejemplo
-#estas asustado?
-
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -13,6 +10,19 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@app.get("/libros/", response_model=List[schemas.Libro])
+async def read_libros(db: Session = Depends(get_db)):
+    return db.query(models.Libro).all()
+
+
 @app.post("/libros/", response_model=schemas.Libro)
 async def create_libro(libro: schemas.LibroCreate, db: Session = Depends(get_db)):
     db_libro = models.Libro(autor=libro.autor, titulo=libro.titulo, estado=libro.estado)
@@ -20,11 +30,6 @@ async def create_libro(libro: schemas.LibroCreate, db: Session = Depends(get_db)
     db.commit()
     db.refresh(db_libro)
     return db_libro
-
-
-@app.get("/libros/", response_model=List[schemas.Libro])
-async def read_libros(db: Session = Depends(get_db)):
-    return db.query(models.Libro).all()
 
 
 @app.post("/usuarios/", response_model=schemas.Usuario)

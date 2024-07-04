@@ -2,12 +2,11 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.exc import OperationalError
 
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:toor@localhost/libros"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:toor@localhost:3306/libros"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
-
 def test_connection():
     try:
         with engine.connect() as connection:
